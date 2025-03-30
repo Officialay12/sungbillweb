@@ -1,0 +1,783 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Billing System Settings</title>
+    <style>
+        /* Modern CSS with variables */
+        :root {
+            --primary: #4361ee;
+            --primary-light: #eef2ff;
+            --secondary: #3f37c9;
+            --danger: #f72585;
+            --success: #4cc9f0;
+            --warning: #f8961e;
+            --dark: #1e293b;
+            --light: #f8fafc;
+            --gray: #94a3b8;
+            --border: #e2e8f0;
+            --radius: 0.5rem;
+            --shadow: 0 1px 3px rgba(0,0,0,0.1);
+            --shadow-md: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f1f5f9;
+            color: var(--dark);
+            line-height: 1.6;
+        }
+        
+        .settings-container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+        
+        .settings-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .settings-title {
+            font-size: 1.75rem;
+            font-weight: 600;
+            color: var(--dark);
+        }
+        
+        .settings-tabs {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .tab-btn {
+            padding: 0.75rem 1.5rem;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+            color: var(--gray);
+            position: relative;
+            transition: all 0.3s ease;
+        }
+        
+        .tab-btn.active {
+            color: var(--primary);
+        }
+        
+        .tab-btn.active::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background-color: var(--primary);
+        }
+        
+        .settings-content {
+            display: none;
+            background: white;
+            padding: 2rem;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+        }
+        
+        .settings-content.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--dark);
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            font-size: 1rem;
+            transition: border 0.3s ease;
+        }
+        
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px var(--primary-light);
+        }
+        
+        .form-row {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-col {
+            flex: 1;
+        }
+        
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: var(--radius);
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--secondary);
+        }
+        
+        .btn-outline {
+            background: none;
+            border: 1px solid var(--border);
+            color: var(--dark);
+        }
+        
+        .btn-outline:hover {
+            background-color: var(--light);
+        }
+        
+        .settings-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+            margin-top: 2rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--border);
+        }
+        
+        .card {
+            background: white;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--dark);
+        }
+        
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+        }
+        
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: var(--gray);
+            transition: .4s;
+            border-radius: 34px;
+        }
+        
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        
+        input:checked + .slider {
+            background-color: var(--primary);
+        }
+        
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            border-radius: 1rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        
+        .badge-success {
+            background-color: #dcfce7;
+            color: #16a34a;
+        }
+        
+        .badge-warning {
+            background-color: #fef9c3;
+            color: #ca8a04;
+        }
+        
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .table th, .table td {
+            padding: 0.75rem 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .table th {
+            font-weight: 600;
+            color: var(--dark);
+            background-color: var(--light);
+        }
+        
+        .table tr:hover td {
+            background-color: var(--primary-light);
+        }
+        
+        @media (max-width: 768px) {
+            .form-row {
+                flex-direction: column;
+                gap: 0;
+            }
+            
+            .settings-tabs {
+                overflow-x: auto;
+                padding-bottom: 0.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="settings-container">
+        <div class="settings-header">
+            <h1 class="settings-title">Billing Settings</h1>
+            <div>
+                <span class="badge badge-success">Active</span>
+            </div>
+        </div>
+        
+        <div class="settings-tabs">
+            <button class="tab-btn active" data-tab="general">General</button>
+            <button class="tab-btn" data-tab="tax">Tax & Fees</button>
+            <button class="tab-btn" data-tab="payment">Payment Methods</button>
+            <button class="tab-btn" data-tab="notifications">Notifications</button>
+            <button class="tab-btn" data-tab="integrations">Integrations</button>
+        </div>
+        
+        <!-- General Settings -->
+        <div id="general" class="settings-content active">
+            <div class="card">
+                <h2 class="card-title">Company Information</h2>
+                <div class="form-row">
+                    <div class="form-col">
+                        <div class="form-group">
+                            <label for="company-name" class="form-label">Company Name</label>
+                            <input type="text" id="company-name" class="form-control" value="Sung Tech.">
+                        </div>
+                    </div>
+                    <div class="form-col">
+                        <div class="form-group">
+                            <label for="company-email" class="form-label">Email Address</label>
+                            <input type="email" id="company-email" class="form-control" value="sungtech@gmail.com">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="company-address" class="form-label">Business Address</label>
+                    <textarea id="company-address" class="form-control" rows="3">9 saint augustine St, Lagos State, CA 101212</textarea>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-col">
+                        <div class="form-group">
+                            <label for="company-phone" class="form-label">Phone Number</label>
+                            <input type="tel" id="company-phone" class="form-control" value="(234) 915-9150375">
+                        </div>
+                    </div>
+                    <div class="form-col">
+                        <div class="form-group">
+                            <label for="company-website" class="form-label">Website</label>
+                            <input type="url" id="company-website" class="form-control" value="https://officialay12.github.io/a1./a3.html">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h2 class="card-title">Invoice Settings</h2>
+                <div class="form-row">
+                    <div class="form-col">
+                        <div class="form-group">
+                            <label for="invoice-prefix" class="form-label">Invoice Prefix</label>
+                            <input type="text" id="invoice-prefix" class="form-control" value="INV-">
+                        </div>
+                    </div>
+                    <div class="form-col">
+                        <div class="form-group">
+                            <label for="invoice-start" class="form-label">Starting Number</label>
+                            <input type="number" id="invoice-start" class="form-control" value="1001">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="invoice-terms" class="form-label">Default Payment Terms</label>
+                    <select id="invoice-terms" class="form-control">
+                        <option value="7">Net 7 Days</option>
+                        <option value="15" selected>Net 15 Days</option>
+                        <option value="30">Net 30 Days</option>
+                        <option value="45">Net 45 Days</option>
+                        <option value="0">Due on Receipt</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Invoice Features</label>
+                    <div style="display: flex; gap: 1.5rem; flex-wrap: wrap;">
+                        <div>
+                            <label style="display: flex; align-items: center; gap: 0.5rem;">
+                                <div class="toggle-switch">
+                                    <input type="checkbox" checked>
+                                    <span class="slider"></span>
+                                </div>
+                                <span>Show Tax ID</span>
+                            </label>
+                        </div>
+                        <div>
+                            <label style="display: flex; align-items: center; gap: 0.5rem;">
+                                <div class="toggle-switch">
+                                    <input type="checkbox" checked>
+                                    <span class="slider"></span>
+                                </div>
+                                <span>Show Discounts</span>
+                            </label>
+                        </div>
+                        <div>
+                            <label style="display: flex; align-items: center; gap: 0.5rem;">
+                                <div class="toggle-switch">
+                                    <input type="checkbox">
+                                    <span class="slider"></span>
+                                </div>
+                                <span>Show Shipping</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="settings-footer">
+                <button class="btn btn-outline">Cancel</button>
+                <button class="btn btn-primary">Save Changes</button>
+            </div>
+        </div>
+        
+        <!-- Tax Settings -->
+        <div id="tax" class="settings-content">
+            <div class="card">
+                <h2 class="card-title">Tax Settings</h2>
+                <div class="form-group">
+                    <label class="form-label">Tax Calculation Method</label>
+                    <div style="display: flex; gap: 1rem; margin-bottom: 1rem;">
+                        <label style="display: flex; align-items: center; gap: 0.5rem;">
+                            <input type="radio" name="tax-method" checked>
+                            <span>Apply tax to each line item</span>
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 0.5rem;">
+                            <input type="radio" name="tax-method">
+                            <span>Apply tax to invoice total</span>
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Default Tax Rate</label>
+                    <div style="display: flex; align-items: center; gap: 0.5rem; max-width: 200px;">
+                        <input type="number" class="form-control" value="7.5" step="0.1">
+                        <span>%</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h2 class="card-title">Tax Rates</h2>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Tax Name</th>
+                            <th>Rate</th>
+                            <th>Description</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Sales Tax</td>
+                            <td>7.5%</td>
+                            <td>Standard sales tax</td>
+                            <td>
+                                <button style="background: none; border: none; color: var(--primary); cursor: pointer;">Edit</button>
+                                <button style="background: none; border: none; color: var(--danger); cursor: pointer; margin-left: 1rem;">Delete</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>VAT</td>
+                            <td>20%</td>
+                            <td>Value added tax</td>
+                            <td>
+                                <button style="background: none; border: none; color: var(--primary); cursor: pointer;">Edit</button>
+                                <button style="background: none; border: none; color: var(--danger); cursor: pointer; margin-left: 1rem;">Delete</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>GST</td>
+                            <td>5%</td>
+                            <td>Goods and services tax</td>
+                            <td>
+                                <button style="background: none; border: none; color: var(--primary); cursor: pointer;">Edit</button>
+                                <button style="background: none; border: none; color: var(--danger); cursor: pointer; margin-left: 1rem;">Delete</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                
+                <button class="btn btn-outline" style="margin-top: 1rem;">
+                    <i class="fas fa-plus"></i> Add New Tax Rate
+                </button>
+            </div>
+            
+            <div class="settings-footer">
+                <button class="btn btn-outline">Cancel</button>
+                <button class="btn btn-primary">Save Changes</button>
+            </div>
+        </div>
+        
+        <!-- Payment Methods -->
+        <div id="payment" class="settings-content">
+            <div class="card">
+                <h2 class="card-title">Payment Methods</h2>
+                <div class="form-group">
+                    <label class="form-label">Enabled Payment Methods</label>
+                    <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                        <label style="display: flex; align-items: center; gap: 0.5rem;">
+                            <input type="checkbox" checked>
+                            <span>Credit/Debit Card</span>
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 0.5rem;">
+                            <input type="checkbox" checked>
+                            <span>Bank Transfer</span>
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 0.5rem;">
+                            <input type="checkbox">
+                            <span>PayPal</span>
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 0.5rem;">
+                            <input type="checkbox" checked>
+                            <span>Stripe</span>
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 0.5rem;">
+                            <input type="checkbox">
+                            <span>Cryptocurrency</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h2 class="card-title">Stripe Integration</h2>
+                <div class="form-group">
+                    <label for="stripe-key" class="form-label">Publishable Key</label>
+                    <input type="text" id="stripe-key" class="form-control" placeholder="pk_test_...">
+                </div>
+                
+                <div class="form-group">
+                    <label for="stripe-secret" class="form-label">Secret Key</label>
+                    <input type="password" id="stripe-secret" class="form-control" placeholder="sk_test_...">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Status</label>
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <div class="badge badge-warning">Not Connected</div>
+                        <button class="btn btn-outline" style="padding: 0.25rem 0.75rem; font-size: 0.875rem;">Connect</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="settings-footer">
+                <button class="btn btn-outline">Cancel</button>
+                <button class="btn btn-primary">Save Changes</button>
+            </div>
+        </div>
+        
+        <!-- Notifications -->
+        <div id="notifications" class="settings-content">
+            <div class="card">
+                <h2 class="card-title">Email Notifications</h2>
+                <div class="form-group">
+                    <label class="form-label">Notification Preferences</label>
+                    <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                        <label style="display: flex; align-items: center; gap: 0.5rem;">
+                            <input type="checkbox" checked>
+                            <span>Invoice created</span>
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 0.5rem;">
+                            <input type="checkbox" checked>
+                            <span>Invoice viewed by client</span>
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 0.5rem;">
+                            <input type="checkbox" checked>
+                            <span>Payment received</span>
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 0.5rem;">
+                            <input type="checkbox">
+                            <span>Invoice overdue</span>
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 0.5rem;">
+                            <input type="checkbox" checked>
+                            <span>Monthly statements</span>
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="notification-email" class="form-label">Notification Email</label>
+                    <input type="email" id="notification-email" class="form-control" value="accounting@acme.com">
+                    <small style="color: var(--gray); display: block; margin-top: 0.25rem;">This email will receive all billing notifications</small>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h2 class="card-title">Client Notifications</h2>
+                <div class="form-group">
+                    <label class="form-label">Send automatic reminders</label>
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <div class="toggle-switch">
+                            <input type="checkbox" checked>
+                            <span class="slider"></span>
+                        </div>
+                        <span>Enable reminders</span>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-col">
+                        <div class="form-group">
+                            <label for="reminder-days" class="form-label">Days Before Due</label>
+                            <input type="number" id="reminder-days" class="form-control" value="3">
+                        </div>
+                    </div>
+                    <div class="form-col">
+                        <div class="form-group">
+                            <label for="reminder-frequency" class="form-label">Frequency</label>
+                            <select id="reminder-frequency" class="form-control">
+                                <option value="1">Daily</option>
+                                <option value="2" selected>Every 2 Days</option>
+                                <option value="3">Every 3 Days</option>
+                                <option value="7">Weekly</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="reminder-message" class="form-label">Reminder Message</label>
+                    <textarea id="reminder-message" class="form-control" rows="4">Dear {Beru!}, 
+
+This is a friendly reminder that invoice #{$100} for {$200} is due on {5/20/2025}. 
+
+Please make payment at your earliest convenience. 
+
+Thank you,
+{Sung Tech🐱‍👤}</textarea>
+                </div>
+            </div>
+            
+            <div class="settings-footer">
+                <button class="btn btn-outline">Cancel</button>
+                <button class="btn btn-primary">Save Changes</button>
+            </div>
+        </div>
+        
+        <!-- Integrations -->
+        <div id="integrations" class="settings-content">
+            <div class="card">
+                <h2 class="card-title">Connected Apps</h2>
+                <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.5rem;">
+                    <div style="border: 1px solid var(--border); border-radius: var(--radius); padding: 1.5rem;">
+                        <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem;">
+                            <div style="width: 40px; height: 40px; background-color: #635bff; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: white;">
+                                <i class="fab fa-stripe"></i>
+                            </div>
+                            <div>
+                                <h3 style="font-weight: 600;">Stripe</h3>
+                                <small style="color: var(--gray);">Payment processing</small>
+                            </div>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div class="badge badge-success">Connected</div>
+                            <button class="btn btn-outline" style="padding: 0.25rem 0.75rem; font-size: 0.875rem;">Disconnect</button>
+                        </div>
+                    </div>
+                    
+                    <div style="border: 1px solid var(--border); border-radius: var(--radius); padding: 1.5rem;">
+                        <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem;">
+                            <div style="width: 40px; height: 40px; background-color: #00a4ef; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: white;">
+                                <i class="fab fa-microsoft"></i>
+                            </div>
+                            <div>
+                                <h3 style="font-weight: 600;">QuickBooks</h3>
+                                <small style="color: var(--gray);">Accounting software</small>
+                            </div>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div class="badge badge-warning">Not Connected</div>
+                            <button class="btn btn-primary" style="padding: 0.25rem 0.75rem; font-size: 0.875rem;">Connect</button>
+                        </div>
+                    </div>
+                    
+                    <div style="border: 1px solid var(--border); border-radius: var(--radius); padding: 1.5rem;">
+                        <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem;">
+                            <div style="width: 40px; height: 40px; background-color: #ff5722; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: white;">
+                                <i class="fab fa-google"></i>
+                            </div>
+                            <div>
+                                <h3 style="font-weight: 600;">Google Workspace</h3>
+                                <small style="color: var(--gray);">Email & calendar</small>
+                            </div>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div class="badge badge-success">Connected</div>
+                            <button class="btn btn-outline" style="padding: 0.25rem 0.75rem; font-size: 0.875rem;">Disconnect</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h2 class="card-title">API Access</h2>
+                <div class="form-group">
+                    <label class="form-label">API Status</label>
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <div class="toggle-switch">
+                            <input type="checkbox">
+                            <span class="slider"></span>
+                        </div>
+                        <span>Enable API access</span>
+                    </div>
+                    <small style="color: var(--gray); display: block; margin-top: 0.25rem;">Allow external applications to access your billing data</small>
+                </div>
+                
+                <div class="form-group">
+                    <label for="api-key" class="form-label">API Key</label>
+                    <div style="display: flex; gap: 0.5rem;">
+                        <input type="text" id="api-key" class="form-control" value="sk_live_1234567890abcdef" readonly>
+                        <button class="btn btn-outline" style="white-space: nowrap;">Copy</button>
+                        <button class="btn btn-outline" style="white-space: nowrap;">Regenerate</button>
+                    </div>
+                    <small style="color: var(--danger); display: block; margin-top: 0.25rem;">Keep this key secret. Do not share it publicly.</small>
+                </div>
+            </div>
+            
+            <div class="settings-footer">
+                <button class="btn btn-outline">Cancel</button>
+                <button class="btn btn-primary">Save Changes</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Tab switching functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const tabButtons = document.querySelectorAll('.tab-btn');
+            const tabContents = document.querySelectorAll('.settings-content');
+            
+            tabButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    // Remove active class from all buttons and contents
+                    tabButtons.forEach(btn => btn.classList.remove('active'));
+                    tabContents.forEach(content => content.classList.remove('active'));
+                    
+                    // Add active class to clicked button
+                    button.classList.add('active');
+                    
+                    // Show corresponding content
+                    const tabId = button.getAttribute('data-tab');
+                    document.getElementById(tabId).classList.add('active');
+                });
+            });
+            
+            // Form submission handling
+            const saveButtons = document.querySelectorAll('.btn-primary');
+            saveButtons.forEach(button => {
+                button.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    alert('Settings saved successfully!');
+                    // In a real app, you would send the form data to your server here
+                });
+            });
+            
+            // Toggle switch functionality
+            const toggleSwitches = document.querySelectorAll('.toggle-switch input');
+            toggleSwitches.forEach(switchInput => {
+                switchInput.addEventListener('change', function() {
+                    const parentCard = this.closest('.card');
+                    if (parentCard) {
+                        if (this.checked) {
+                            parentCard.style.boxShadow = '0 0 0 2px var(--primary-light)';
+                            setTimeout(() => {
+                                parentCard.style.boxShadow = 'var(--shadow)';
+                            }, 500);
+                        }
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

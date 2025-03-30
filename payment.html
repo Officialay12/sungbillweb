@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sung Online Payment | InvoiceFlow</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #4361ee;
+            --primary-light: #eef2ff;
+            --primary-dark: #3a56d4;
+            --danger: #f72585;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --dark: #1e293b;
+            --light: #f8fafc;
+            --gray: #94a3b8;
+            --gray-light: #e2e8f0;
+            --border: #e2e8f0;
+            --radius: 0.5rem;
+            --shadow: 0 1px 3px rgba(0,0,0,0.1);
+            --shadow-md: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f1f5f9;
+            color: var(--dark);
+            line-height: 1.6;
+        }
+        
+        .payment-container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+            display: grid;
+            grid-template-columns: 1fr 350px;
+            gap: 2rem;
+        }
+        
+        @media (max-width: 768px) {
+            .payment-container {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        /* Payment Form Styles */
+        .payment-form {
+            background: white;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 2rem;
+        }
+        
+        .payment-header {
+            margin-bottom: 2rem;
+        }
+        
+        .payment-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        
+        .payment-subtitle {
+            color: var(--gray);
+            font-size: 0.875rem;
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--dark);
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px var(--primary-light);
+        }
+        
+        .form-row {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-col {
+            flex: 1;
+        }
+        
+        /* Payment Method Selector */
+        .payment-methods {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .payment-method {
+            flex: 1;
+            position: relative;
+        }
+        
+        .payment-method input {
+            position: absolute;
+            opacity: 0;
+        }
+        
+        .payment-method label {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 1rem;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+        
+        .payment-method input:checked + label {
+            border-color: var(--primary);
+            background-color: var(--primary-light);
+        }
+        
+        .payment-method i {
+            font-size: 1.5rem;
+        }
+        
+        /* Card Element Container */
+        .card-element {
+            padding: 1rem;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            margin-bottom: 1.5rem;
+            background: white;
+        }
+        
+        /* Saved Cards */
+        .saved-cards {
+            margin-bottom: 1.5rem;
+        }
+        
+        .saved-card {
+            display: flex;
+            align-items: center;
+            padding: 1rem;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            margin-bottom: 0.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .saved-card:hover {
+            border-color: var(--primary);
+        }
+        
+        .saved-card input:checked + label {
+            border-color: var(--primary);
+            background-color: var(--primary-light);
+        }
+        
+        .saved-card input {
+            margin-right: 1rem;
+        }
+        
+        .card-brand {
+            margin-right: 1rem;
+            font-size: 1.5rem;
+            color: var(--gray);
+        }
+        
+        .card-details {
+            flex: 1;
+        }
+        
+        .card-details .card-number {
+            font-weight: 500;
+            margin-bottom: 0.25rem;
+        }
+        
+        .card-details .card-expiry {
+            font-size: 0.875rem;
+            color: var(--gray);
+        }
+        
+        /* Summary Panel */
+        .summary-panel {
+            background: white;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 2rem;
+            height: fit-content;
+            position: sticky;
+            top: 2rem;
+        }
+        
+        .summary-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .invoice-details {
+            margin-bottom: 1.5rem;
+        }
+        
+        .invoice-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.75rem;
+        }
+        
+        .invoice-label {
+            color: var(--gray);
+        }
+        
+        .invoice-value {
+            font-weight: 500;
+        }
+        
+        .invoice-total {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--border);
+        }
+        
+        /* Buttons */
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: var(--radius);
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+        
+        .btn-block {
+            display: block;
+            width: 100%;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+        }
+        
+        .btn-outline {
+            background: none;
+            border: 1px solid var(--border);
+            color: var(--dark);
+        }
+        
+        .btn-outline:hover {
+            background-color: var(--light);
+        }
+        
+        /* Secure Payment Info */
+        .secure-payment {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-top: 1.5rem;
+            color: var(--gray);
+            font-size: 0.875rem;
+        }
+        
+        /* Loading State */
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 2rem;
+        }
+        
+        .loading-spinner {
+            border: 3px solid var(--primary-light);
+            border-top: 3px solid var(--primary);
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Success State */
+        .payment-success {
+            display: none;
+            text-align: center;
+            padding: 2rem;
+        }
+        
+        .success-icon {
+            width: 60px;
+            height: 60px;
+            background-color: var(--success);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+            font-size: 1.5rem;
+        }
+        
+        /* Error Messages */
+        .error-message {
+            color: var(--danger);
+            font-size: 0.875rem;
+            margin-top: 0.5rem;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="payment-container">
+        <!-- Payment Form -->
+        <div class="payment-form">
+            <div class="payment-header">
+                <h1 class="payment-title">Payment Method</h1>
+                <p class="payment-subtitle">Complete your payment securely</p>
+            </div>
+            
+            <!-- Active Payment Form -->
+            <div id="payment-form-active">
+                <!-- Payment Method Selection -->
+                <div class="form-group">
+                    <label class="form-label">Select Payment Method</label>
+                    <div class="payment-methods">
+                        <div class="payment-method">
+                            <input type="radio" id="method-card" name="payment-method" checked>
+                            <label for="method-card">
+                                <i class="far fa-credit-card"></i>
+                                <span>Credit Card</span>
+                            </label>
+                        </div>
+                        <div class="payment-method">
+                            <input type="radio" id="method-paypal" name="payment-method">
+                            <label for="method-paypal">
+                                <i class="fab fa-paypal"></i>
+                                <span>PayPal</span>
+                            </label>
+                        </div>
+                        <div class="payment-method">
+                            <input type="radio" id="method-bank" name="payment-method">
+                            <label for="method-bank">
+                                <i class="fas fa-university"></i>
+                                <span>Bank Transfer</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Saved Cards -->
+                <div class="saved-cards" id="saved-cards">
+                    <div class="form-label">Saved Payment Methods</div>
+                    <div class="saved-card">
+                        <input type="radio" id="card-1" name="saved-card" checked>
+                        <label for="card-1" style="border: none; padding: 0; width: 100%;">
+                            <div style="display: flex; align-items: center; width: 100%;">
+                                <div class="card-brand">
+                                    <i class="fab fa-cc-visa"></i>
+                                </div>
+                                <div class="card-details">
+                                    <div class="card-number">•••• •••• •••• 4242</div>
+                                    <div class="card-expiry">Expires 04/2027</div>
+                                </div>
+                            </div>
+                        </label>
+                    </div>
+                    <div class="saved-card">
+                        <input type="radio" id="card-2" name="saved-card">
+                        <label for="card-2" style="border: none; padding: 0; width: 100%;">
+                            <div style="display: flex; align-items: center; width: 100%;">
+                                <div class="card-brand">
+                                    <i class="fab fa-cc-mastercard"></i>
+                                </div>
+                                <div class="card-details">
+                                    <div class="card-number">•••• •••• •••• 5555</div>
+                                    <div class="card-expiry">Expires 08/2027</div>
+                                </div>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+                
+                <!-- New Card Form (shown when "Add new card" is selected) -->
+                <div id="new-card-form">
+                    <div class="form-group">
+                        <label for="card-name" class="form-label">Name on Card</label>
+                        <input type="text" id="card-name" class="form-control" placeholder="Ayomide Omole">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="card-number" class="form-label">Card Number</label>
+                        <input type="text" id="card-number" class="form-control" placeholder="4242 4242 5672 4231">
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label for="card-expiry" class="form-label">Expiration Date</label>
+                                <input type="text" id="card-expiry" class="form-control" placeholder="MM/YY">
+                            </div>
+                        </div>
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label for="card-cvc" class="form-label">CVC</label>
+                                <input type="text" id="card-cvc" class="form-control" placeholder="123">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="save-card" class="form-label">
+                            <input type="checkbox" id="save-card" checked>
+                            Save this card for future payments
+                        </label>
+                    </div>
+                </div>
+                
+                <!-- Billing Address -->
+                <div class="form-group">
+                    <label class="form-label">Billing Address</label>
+                    <div class="form-row">
+                        <div class="form-col">
+                            <select class="form-control">
+                                <option>United States</option>
+                                <option>Canada</option>
+                                <option>United Kingdom</option>
+                                <option>Nigeria</option>
+                                <option>Other</option>
+                            </select>
+                        </div>
+                        <div class="form-col">
+                            <input type="text" class="form-control" placeholder="ZIP/Postal Code">
+                        </div>
+                    </div>
+                </div>
+                
+                <button id="submit-payment" class="btn btn-primary btn-block">
+                    <i class="fas fa-lock"></i> Pay $200.00
+                </button>
+                
+                <div class="secure-payment">
+                    <i class="fas fa-lock"></i>
+                    <span>Secure SSL Encryption</span>
+                </div>
+                
+                <div id="payment-error" class="error-message">
+                    There was an error processing your payment. Please try again.
+                </div>
+            </div>
+            
+            <!-- Loading State -->
+            <div id="payment-loading" class="loading">
+                <div class="loading-spinner"></div>
+                <p>Processing your payment...</p>
+                <p>Please don't close this window</p>
+            </div>
+            
+            <!-- Success State -->
+            <div id="payment-success" class="payment-success">
+                <div class="success-icon">
+                    <i class="fas fa-check"></i>
+                </div>
+                <h2>Payment Successful!</h2>
+                <p>Your payment of $200.00 has been processed successfully. ARISE!!</p>
+                <p>Transaction ID: INV-2025-0456-PAY</p>
+                <button class="btn btn-outline" style="margin-top: 1.5rem;">
+                    <i class="fas fa-print"></i> Print Receipt
+                </button>
+            </div>
+        </div>
+        
+        <!-- Summary Panel -->
+        <div class="summary-panel">
+            <h2 class="summary-title">Payment Summary</h2>
+            
+            <div class="invoice-details">
+                <div class="invoice-row">
+                    <span class="invoice-label">Invoice Number</span>
+                    <span class="invoice-value">INV-2023-0456</span>
+                </div>
+                <div class="invoice-row">
+                    <span class="invoice-label">Date Issued</span>
+                    <span class="invoice-value">March 30, 2025</span>
+                </div>
+                <div class="invoice-row">
+                    <span class="invoice-label">Due Date</span>
+                    <span class="invoice-value">March 30, 2025</span>
+                </div>
+            </div>
+            
+            <div class="invoice-details">
+                <div class="invoice-row">
+                    <span class="invoice-label">Subtotal</span>
+                    <span class="invoice-value">$120.00</span>
+                </div>
+                <div class="invoice-row">
+                    <span class="invoice-label">Tax (8.5%)</span>
+                    <span class="invoice-value">$97.75</span>
+                </div>
+                <div class="invoice-row">
+                    <span class="invoice-label">Discount</span>
+                    <span class="invoice-value">-$50.00</span>
+                </div>
+                <div class="invoice-row invoice-total">
+                    <span>Total Amount</span>
+                    <span>$200.00</span>
+                </div>
+            </div>
+            
+            <div class="invoice-details">
+                <div class="invoice-row">
+                    <span class="invoice-label">Client</span>
+                    <span class="invoice-value">Sung Tech</span>
+                </div>
+                <div class="invoice-row">
+                    <span class="invoice-label">Email</span>
+                    <span class="invoice-value">sungtech675@gmail.com</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Payment method selection
+            const paymentMethods = document.querySelectorAll('input[name="payment-method"]');
+            const savedCards = document.getElementById('saved-cards');
+            const newCardForm = document.getElementById('new-card-form');
+            
+            paymentMethods.forEach(method => {
+                method.addEventListener('change', function() {
+                    if (this.id === 'method-card') {
+                        savedCards.style.display = 'block';
+                        newCardForm.style.display = 'block';
+                    } else {
+                        savedCards.style.display = 'none';
+                        newCardForm.style.display = 'none';
+                    }
+                });
+            });
+            
+            // Saved card selection
+            const savedCardRadios = document.querySelectorAll('input[name="saved-card"]');
+            savedCardRadios.forEach(radio => {
+                radio.addEventListener('change', function() {
+                    if (this.id === 'card-2') {
+                        // When selecting the second saved card, show the CVC field
+                        document.getElementById('card-cvc').parentElement.style.display = 'block';
+                    } else {
+                        document.getElementById('card-cvc').parentElement.style.display = 'none';
+                    }
+                });
+            });
+            
+            // Form submission
+            const paymentForm = document.getElementById('payment-form-active');
+            const loadingState = document.getElementById('payment-loading');
+            const successState = document.getElementById('payment-success');
+            const errorMessage = document.getElementById('payment-error');
+            const submitBtn = document.getElementById('submit-payment');
+            
+            submitBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                // Simple validation
+                const cardName = document.getElementById('card-name').value;
+                const cardNumber = document.getElementById('card-number').value;
+                const cardExpiry = document.getElementById('card-expiry').value;
+                const cardCvc = document.getElementById('card-cvc').value;
+                
+                if (!cardName || !cardNumber || !cardExpiry || !cardCvc) {
+                    errorMessage.style.display = 'block';
+                    return;
+                }
+                
+                // Show loading state
+                paymentForm.style.display = 'none';
+                loadingState.style.display = 'block';
+                errorMessage.style.display = 'none';
+                
+                // Simulate payment processing
+                setTimeout(function() {
+                    loadingState.style.display = 'none';
+                    successState.style.display = 'block';
+                    
+                    // In a real app, you would redirect or update the UI accordingly
+                }, 3000);
+            });
+            
+            // Format card number input
+            const cardNumberInput = document.getElementById('card-number');
+            cardNumberInput.addEventListener('input', function(e) {
+                let value = e.target.value.replace(/\s+/g, '').replace(/[^0-9]/gi, '');
+                let matches = value.match(/\d{4,16}/g);
+                let match = matches && matches[0] || '';
+                let parts = [];
+                
+                for (let i=0, len=match.length; i<len; i+=4) {
+                    parts.push(match.substring(i, i+4));
+                }
+                
+                if (parts.length) {
+                    e.target.value = parts.join(' ');
+                } else {
+                    e.target.value = value;
+                }
+            });
+            
+            // Format expiry date input
+            const expiryInput = document.getElementById('card-expiry');
+            expiryInput.addEventListener('input', function(e) {
+                let value = e.target.value.replace(/\s+/g, '').replace(/[^0-9]/gi, '');
+                if (value.length > 2) {
+                    value = value.substring(0, 2) + '/' + value.substring(2, 4);
+                }
+                e.target.value = value;
+            });
+        });
+    </script>
+</body>
+</html>
